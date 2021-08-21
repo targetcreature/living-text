@@ -26,47 +26,36 @@ export const Form: React.FC = () => {
 
                     const { value } = target
 
-                    const isEmpty = !!value[0].match(" ")
+                    const isEmpty = !value || !!value[0].match(" ")
                    
-                    if(isEmpty){
-                        return
-                    }
-
-                    const first = value.slice(0,-1)
-                    const last = value.slice(-1)
-
-                    const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
-                    const isSpace = !!last.match(" ") 
-                    
-                    console.log({value, first, last, isPunc, isSpace}) 
-
-                    if(isPunc){
+                    if(!isEmpty){
+                        
+                        const first = value.slice(0,-1)
+                        const last = value.slice(-1)
+                        
+                        const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
+                        const isSpace = !!last.match(" ") 
+                        
+                        console.log({value, first, last, isPunc, isSpace}) 
+                        
+                        if(isPunc){
                             setStore((s) => {
                                 s.words.push({content: first})
                                 s.words.push({content: `${last}${!isSpace ? " " : ""}`, isPunc: true})
                                 return s
                             })
                             setState("")
+                        }
+                        else{
+                            setState((s) => isEmpty ? "" : target.value)
+                        }
                     }
-                    else{
-                        setState((s) => target.value)
-                    }
 
-
-                    // if(/^[\pL\pN]+$/.test(value)){
-                    //     // has non-alphanumeric
-                    // }
-
-
-                    // if (/\s+$/.test(value)) {
-
-                    //     setStore((s) => {
-                    //         s.words.push({content: state || " "})
-                    //         return s
-                    //     })
-                    //     setState("")
-                    // }
-                }} 
+                    else setState("")
+                        
+                        
+                        
+                    }} 
                 
                 value={state}
 

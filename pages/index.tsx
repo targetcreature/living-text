@@ -20,7 +20,8 @@ const App: React.FC = () => {
                 height: "100vh",
                 display: "flex",
                 alignContent: "center",
-                justifyContent: "center"
+                justifyContent: "center",
+                padding: "5vh 0"
             }}>
 
                 <div style={{
@@ -49,8 +50,8 @@ const Pause: React.FC = () => {
             })}
             style={{
                 position: "absolute",
-                top: 20,
-                right: 20,
+                top: "5vh",
+                right: "5vh",
                 border: `1px solid ${isHover || isPause ? "black" : "lightgray"}`,
                 background: isHover || isPause ? "lightgray" : "none",
             }}>
