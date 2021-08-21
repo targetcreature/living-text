@@ -29,19 +29,25 @@ export const Word: React.FC<{ word: string }> = ({ word }) => {
     }, [])
 
 
+    const triggerPause = ()=> setPause(current)
+
     useEffect(() => {
         if (isPause) {
-            setPause(current)
+            triggerPause()
         }
-    }, [isPause, current])
+    }, [isPause])
 
-    const idx = synonyms.length > 1 ? isPause ? pauseCount : current : 0
+    const idxCount = synonyms.length > 1 ? current : 0
+    const idx = !idxCount ? 0 : isPause ? pauseCount : current
 
     const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
 
     const syn = synonyms[idx]
     const first = isLower ? syn[0] : syn[0].toUpperCase()
     const end = syn.slice(1)
+
+    console.log(pauseCount)
+
 
 
     return (
