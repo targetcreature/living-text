@@ -37,9 +37,16 @@ export const Word: React.FC<{ word: string }> = ({ word }) => {
 
     const idx = synonyms.length > 1 ? isPause ? pauseCount : current : 0
 
+    const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
+
+    const syn = synonyms[idx]
+    const first = isLower ? syn[0] : syn[0].toUpperCase()
+    const end = syn.slice(1)
+
 
     return (
-        <div style={{ display: "inline-block" }}>{synonyms[idx]}</div>
+        <div style={{ display: "inline-block" }}>{first}{end}</div>
+        // <div style={{ display: "inline-block" }}>{synonyms[idx]}</div>
     )
 
 }

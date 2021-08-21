@@ -29,11 +29,8 @@ export const Form: React.FC = () => {
                     const isEmpty = !!value[0].match(" ")
                    
                     if(isEmpty){
-                        console.log("empty")
                         return
-                        
                     }
-
 
                     const first = value.slice(0,-1)
                     const last = value.slice(-1)
