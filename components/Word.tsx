@@ -1,65 +1,45 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useStore } from "../context"
 import fetch from "isomorphic-unfetch"
 
-export const Word: React.FC<{ index: number }> = ({ index }) => {
+export const Word: React.FC<{ word: string }> = ({ word }) => {
 
-    const { setStore, words } = useStore()
-    const [word, setWord] = useState("")
-    const [synonyms, setSynonyms] = useState([])
-    const [init, setInit] = useState(true)
-    const [initFetch, setInitFetch] = useState(true)
+    const { isPause, words } = useStore()
+    // const [word, setWord] = useState("")
+    const [synonyms, setSynonyms] = useState([word])
+    // const [init, setInit] = useState(true)
+    // const [initFetch, setInitFetch] = useState(true)
     const [current, setCurrent] = useState(0)
+    const [pauseCount, setPause] = useState(0)
 
     useEffect(() => {
 
-        if (init) {
-            setWord(words[index])
-            setSynonyms([words[index]])
-            setInit(false)
-        }
+        setInterval(() => setCurrent((c) => c + 1), 10000)
 
-    }, [words, init])
+        fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
+            .then(r => r.json())
+            .then(data => {
+                data.length > 0 && data.map((d) =>
+                    d.meanings.map((m) =>
+                        m.definitions.map((def) =>
+                            setSynonyms((s) => {
+                                return [...s, ...def.synonyms]
+                            }))))
+            })
+    }, [])
 
-    useEffect(() => {
-
-        if (word) {
-
-            if (initFetch) {
-
-                fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
-                    .then(r => r.json())
-                    .then(data => {
-                        data.length > 0 && data.map((d) =>
-                            d.meanings.map((m) =>
-                                m.definitions.map((def) =>
-                                    setSynonyms((s) => {
-                                        return [...s, ...def.synonyms]
-                                    }))))
-                    })
-            }
-
-            setInitFetch(false)
-        }
-
-    }, [word, initFetch])
 
     useEffect(() => {
-
-        if (synonyms.length > 1) {
-            setInterval(()=>{
-                setCurrent((c)=> {
-                    if (c+1 > synonyms.length) return 0
-                    else return c + 1
-                })
-            },10000)
-
+        if (isPause) {
+            setPause(current)
         }
+    }, [isPause, current])
 
-    }, [synonyms])
+    const idx = synonyms.length > 1 ? isPause ? pauseCount : current : 0
+
 
     return (
-        <div style={{ display: "inline-block" }}>{synonyms[current]}&nbsp;</div>
+        <div style={{ display: "inline-block" }}>{synonyms[idx]}</div>
     )
 
 }

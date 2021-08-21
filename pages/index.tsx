@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import fetch from "isomorphic-unfetch"
 import { Word } from "../components/Word"
 import { Provider, useStore } from "../context"
@@ -28,10 +28,36 @@ const App: React.FC = () => {
                     width: "50vw"
                 }}>
                     <Form />
+                    <Pause/>
                 </div>
             </div>
         </Provider>
     )
+}
+
+const Pause: React.FC = () => {
+
+    const [isHover, setHover] = useState(false)
+    const {isPause, setStore} = useStore()
+
+    return (
+        <div
+            onMouseEnter={()=>setHover(true)}
+            onMouseLeave={()=>setHover(false)}
+            onClick={()=>setStore((state)=>{
+                return {...state, isPause: !state.isPause}
+            })}
+            style={{
+                position: "absolute",
+                top: 20,
+                right: 20,
+                border: `1px solid ${isHover || isPause ? "black" : "lightgray"}`,
+                background: isHover || isPause ? "lightgray" : "none",
+            }}>
+            Pause
+        </div>
+    )
+
 }
 
 export default App

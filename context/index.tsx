@@ -1,16 +1,23 @@
 import { createContext, useContext, useState } from "react"
 
 export type State = {
-    words: string[]
+    words: {
+        content: string
+        isPunc?: boolean
+    }[]
+    isPause: boolean
 }
 
-const init = { words: []}
+const init = { 
+    words: [],
+    isPause: false
+}
 
 const Context = createContext<[State, React.Dispatch<React.SetStateAction<State>>]>([init, () => null])
 
 export const Provider: React.FC<{}> = ({ children }) => {
 
-    const state = useState<{words:string[]}>(init)
+    const state = useState<State>(init)
 
     return (
         <Context.Provider value={state}>

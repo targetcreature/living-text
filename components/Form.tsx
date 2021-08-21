@@ -11,27 +11,67 @@ export const Form: React.FC = () => {
     return (
         <div>
             {
-                words.map((_, i) =>
-                    <Word key={i} index={i} />
+                words.map(({ isPunc, content }, i) =>
+                    isPunc ?
+                        <span>{content}</span>
+                        :
+                        <Word key={i} word={content} />
                 )
             }
             <input
 
-                autoFocus
+                ref={input => input && input.focus()}
 
                 onChange={({ target }) => {
 
                     const { value } = target
-                    setState((s) => target.value)
-                    if (/\s+$/.test(value)) {
 
-                        setStore((s) => {
-                            s.words.push(state || " ")
-                            return s
-                        })
-                        setState("")
+                    const isEmpty = !!value[0].match(" ")
+                   
+                    if(isEmpty){
+                        console.log("empty")
+                        return
+                        
                     }
-                }} value={state}
+
+
+                    const first = value.slice(0,-1)
+                    const last = value.slice(-1)
+
+                    const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
+                    const isSpace = !!last.match(" ") 
+                    
+                    console.log({value, first, last, isPunc, isSpace}) 
+
+                    if(isPunc){
+                            setStore((s) => {
+                                s.words.push({content: first})
+                                s.words.push({content: `${last}${!isSpace ? " " : ""}`, isPunc: true})
+                                return s
+                            })
+                            setState("")
+                    }
+                    else{
+                        setState((s) => target.value)
+                    }
+
+
+                    // if(/^[\pL\pN]+$/.test(value)){
+                    //     // has non-alphanumeric
+                    // }
+
+
+                    // if (/\s+$/.test(value)) {
+
+                    //     setStore((s) => {
+                    //         s.words.push({content: state || " "})
+                    //         return s
+                    //     })
+                    //     setState("")
+                    // }
+                }} 
+                
+                value={state}
 
                 style={{
                     border: 0,
