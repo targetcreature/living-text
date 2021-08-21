@@ -15,21 +15,31 @@ export const Form: React.FC = () => {
                     <Word key={i} index={i} />
                 )
             }
-            <input onChange={({ target }) => {
+            <input
 
-                const { value } = target
+                autoFocus
 
-                setState((s) => target.value)
+                onChange={({ target }) => {
 
-                if (/\s+$/.test(value)) {
+                    const { value } = target
+                    setState((s) => target.value)
+                    if (/\s+$/.test(value)) {
 
-                    setStore((s) => {
-                        s.words.push(state || " ")
-                        return s
-                    })
-                    setState("")
-                }
-            }} value={state} />
+                        setStore((s) => {
+                            s.words.push(state || " ")
+                            return s
+                        })
+                        setState("")
+                    }
+                }} value={state}
+
+                style={{
+                    border: 0,
+                    borderBottom: "3px solid lightgray",
+                    fontSize: 40,
+                    outline: 0
+                }}
+            />
         </div>
     )
 

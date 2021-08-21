@@ -30,17 +30,12 @@ export const Word: React.FC<{ index: number }> = ({ index }) => {
                 fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
                     .then(r => r.json())
                     .then(data => {
-                        // console.log(data[0].meanings[0].definitions[0].synonyms)
                         data.length > 0 && data.map((d) =>
                             d.meanings.map((m) =>
                                 m.definitions.map((def) =>
                                     setSynonyms((s) => {
                                         return [...s, ...def.synonyms]
                                     }))))
-                        // console.log(data[0].meanings[0].definitions[0].synonyms)
-
-                        // setSynonyms(data.)
-
                     })
             }
 
@@ -52,13 +47,12 @@ export const Word: React.FC<{ index: number }> = ({ index }) => {
     useEffect(() => {
 
         if (synonyms.length > 1) {
-            console.log(synonyms)
             setInterval(()=>{
                 setCurrent((c)=> {
                     if (c+1 > synonyms.length) return 0
                     else return c + 1
                 })
-            },3000)
+            },10000)
 
         }
 
