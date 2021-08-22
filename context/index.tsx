@@ -6,11 +6,13 @@ export type State = {
         isPunc?: boolean
     }[]
     isPause: boolean
+    isOriginal: boolean
 }
 
 const init = { 
     words: [],
-    isPause: false
+    isPause: false,
+    isOriginal: false
 }
 
 const Context = createContext<[State, React.Dispatch<React.SetStateAction<State>>]>([init, () => null])

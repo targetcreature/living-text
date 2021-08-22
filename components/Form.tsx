@@ -13,7 +13,7 @@ export const Form: React.FC = () => {
             {
                 words.map(({ isPunc, content }, i) =>
                     isPunc ?
-                        <span>{content}</span>
+                        <span key={i}>{content}</span>
                         :
                         <Word key={i} word={content} />
                 )
@@ -26,37 +26,39 @@ export const Form: React.FC = () => {
 
                     const { value } = target
 
-                    const isEmpty = !value || !!value[0].match(" ")
-                   
-                    if(!isEmpty){
-                        
-                        const first = value.slice(0,-1)
-                        const last = value.slice(-1)
-                        
-                        const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
-                        const isSpace = !!last.match(" ") 
-                        
-                        console.log({value, first, last, isPunc, isSpace}) 
-                        
-                        if(isPunc){
-                            setStore((s) => {
-                                s.words.push({content: first})
-                                s.words.push({content: `${last}${!isSpace ? " " : ""}`, isPunc: true})
-                                return s
-                            })
-                            setState("")
-                        }
-                        else{
-                            setState((s) => isEmpty ? "" : target.value)
-                        }
+                    const isEmpty = !value || !!value[0].match(" ") || !value[0].match("^[a-zA-Z0-9]+$")
+
+                    if (!isEmpty) {
+
+                            const first = value.slice(0, -1)
+                            const last = value.slice(-1)
+
+                            const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
+                            const isSpace = !!last.match(" ")
+
+                            if (last.match("\n")) console.log("new line")
+
+
+                            if (isPunc) {
+                                setStore((s) => {
+                                    s.words.push({ content: first })
+                                    s.words.push({ content: `${last}${!isSpace ? " " : ""}`, isPunc: true })
+                                    return s
+                                })
+                                setState("")
+                            }
+                            else {
+                                setState((s) => isEmpty ? "" : target.value)
+                            }
+
                     }
 
                     else setState("")
-                        
-                        
-                        
-                    }} 
-                
+
+
+
+                }}
+
                 value={state}
 
                 style={{

@@ -4,17 +4,14 @@ import fetch from "isomorphic-unfetch"
 
 export const Word: React.FC<{ word: string }> = ({ word }) => {
 
-    const { isPause, words } = useStore()
-    // const [word, setWord] = useState("")
+    const { isPause, isOriginal } = useStore()
     const [synonyms, setSynonyms] = useState([word])
-    // const [init, setInit] = useState(true)
-    // const [initFetch, setInitFetch] = useState(true)
     const [current, setCurrent] = useState(0)
     const [pauseCount, setPause] = useState(0)
 
     useEffect(() => {
 
-        setInterval(() => setCurrent((c) => c + 1), 10000)
+        const interval = setInterval(() => setCurrent((c) => c + 1), 5000)
 
         fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
             .then(r => r.json())
@@ -26,10 +23,12 @@ export const Word: React.FC<{ word: string }> = ({ word }) => {
                                 return [...s, ...def.synonyms]
                             }))))
             })
+
+        return () => clearInterval(interval)
     }, [])
 
 
-    const triggerPause = ()=> setPause(current)
+    const triggerPause = () => setPause(current)
 
     useEffect(() => {
         if (isPause) {
@@ -37,7 +36,7 @@ export const Word: React.FC<{ word: string }> = ({ word }) => {
         }
     }, [isPause])
 
-    const idxCount = synonyms.length > 1 ? current : 0
+    const idxCount = synonyms.length > 1 ? current > synonyms.length - 1 ? 0 : current : 0
     const idx = !idxCount ? 0 : isPause ? pauseCount : current
 
     const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
@@ -46,13 +45,15 @@ export const Word: React.FC<{ word: string }> = ({ word }) => {
     const first = isLower ? syn[0] : syn[0].toUpperCase()
     const end = syn.slice(1)
 
-    console.log(pauseCount)
-
+    const print = isOriginal ? word : `${first}${end}`
 
 
     return (
-        <div style={{ display: "inline-block" }}>{first}{end}</div>
-        // <div style={{ display: "inline-block" }}>{synonyms[idx]}</div>
+        <div
+            style={{ display: "inline-block" }}
+        >
+            {print}
+        </div>
     )
 
 }
