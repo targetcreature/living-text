@@ -4,6 +4,7 @@ export type State = {
     words: {
         content: string
         isPunc?: boolean
+        isLine?: boolean
     }[]
     isPause: boolean
     isOriginal: boolean
@@ -12,7 +13,8 @@ export type State = {
 const init = { 
     words: [],
     isPause: false,
-    isOriginal: false
+    isOriginal: false,
+    isLine: false
 }
 
 const Context = createContext<[State, React.Dispatch<React.SetStateAction<State>>]>([init, () => null])

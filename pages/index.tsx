@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Provider, useStore } from "../context"
 import { Form } from "../components/Form"
 import { IoMdPause as PauseIcon } from "react-icons/io"
@@ -6,6 +6,8 @@ import { IoMdPlay as PlayIcon } from "react-icons/io"
 import { VscEye as EyeIcon } from "react-icons/vsc"
 
 const App: React.FC = () => {
+
+    const ref = useRef()
 
     return (
         <Provider>
@@ -15,20 +17,19 @@ const App: React.FC = () => {
                 display: "flex",
                 alignContent: "center",
                 justifyContent: "center",
-                padding: "5vh 0"
-            }}>
+                padding: "5vh 0",
+            }}
+            >
 
-                <div style={{
-                    fontSize: 40,
-                    width: "50vw"
-                }}>
+                <div id="container">
                     <Form />
                     <div
-                        style={{
-                            position: "absolute",
-                            top: "5vh",
-                            right: "5vh",
-                        }}
+                        id="buttons"
+                    // style={{
+                    //     position: "absolute",
+                    //     top: "5vh",
+                    //     right: "5vh",
+                    // }}
                     >
                         <Pause />
                         <Original />
@@ -71,7 +72,8 @@ const Original: React.FC = () => {
         <EyeIcon
             onMouseEnter={() => setStore((s) => ({ ...s, isOriginal: true }))}
             onMouseLeave={() => setStore((s) => ({ ...s, isOriginal: false }))}
-            color="lightgray"
+            onClick={()=> setStore((s)=>({...s, isOriginal: !s.isOriginal}))}
+            color={isOriginal ? "black" : "lightgray"}
         />
     )
 

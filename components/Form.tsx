@@ -11,16 +11,35 @@ export const Form: React.FC = () => {
     return (
         <div>
             {
-                words.map(({ isPunc, content }, i) =>
+                words.map(({ isPunc, isLine, content }, i) =>
                     isPunc ?
                         <span key={i}>{content}</span>
                         :
-                        <Word key={i} word={content} />
+                        isLine ?
+                            <div />
+                            :
+                            <Word key={i} word={content} />
                 )
             }
             <input
 
-                ref={input => input && input.focus()}
+            ref={(input)=> input && input.focus()}
+
+                onKeyDown={e => {
+                    if (e.key === 'Enter') {
+
+                        setStore((s) => {
+                            if (state) {
+                                s.words.push({ content: state })
+                            }
+                            s.words.push({ content: "", isLine: true })
+                            return s
+                        })
+                        setState("")
+
+                    }
+                }
+                }
 
                 onChange={({ target }) => {
 
@@ -30,26 +49,26 @@ export const Form: React.FC = () => {
 
                     if (!isEmpty) {
 
-                            const first = value.slice(0, -1)
-                            const last = value.slice(-1)
+                        const first = value.slice(0, -1)
+                        const last = value.slice(-1)
 
-                            const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
-                            const isSpace = !!last.match(" ")
+                        const isPunc = !last.match("^[a-zA-Z0-9]+$") && !last.match(`'`)
+                        const isSpace = !!last.match(" ")
 
-                            if (last.match("\n")) console.log("new line")
+                        if (last.match("\n")) console.log("new line")
 
 
-                            if (isPunc) {
-                                setStore((s) => {
-                                    s.words.push({ content: first })
-                                    s.words.push({ content: `${last}${!isSpace ? " " : ""}`, isPunc: true })
-                                    return s
-                                })
-                                setState("")
-                            }
-                            else {
-                                setState((s) => isEmpty ? "" : target.value)
-                            }
+                        if (isPunc) {
+                            setStore((s) => {
+                                s.words.push({ content: first })
+                                s.words.push({ content: `${last}${!isSpace ? " " : ""}`, isPunc: true })
+                                return s
+                            })
+                            setState("")
+                        }
+                        else {
+                            setState((s) => isEmpty ? "" : target.value)
+                        }
 
                     }
 
