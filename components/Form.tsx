@@ -9,7 +9,7 @@ export const Form: React.FC = () => {
     const [state, setState] = useState("")
 
     return (
-        <div>
+        <div id="form">
             {
                 words.map(({ isPunc, isLine, content }, i) =>
                     isPunc ?

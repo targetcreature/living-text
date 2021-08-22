@@ -1,4 +1,13 @@
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+
+    #container{
+        #form{
+            transform: translate(-1vh,0);
+            input{
+                border-radius: 0;
+            }
+        }
+    }
     
     #buttons{
         // top: 100vh;
