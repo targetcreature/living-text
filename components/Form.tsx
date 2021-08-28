@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useStore } from "../context"
-import { Word } from "./Word"
+import { Word } from "./z__old__Word"
 
 export const Form: React.FC = () => {
 

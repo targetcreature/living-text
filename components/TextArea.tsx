@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useStore } from "../context"
-import { Word } from "./Word2"
+import { Word } from "./Word"
 
 export const TextArea: React.FC = () => {
 

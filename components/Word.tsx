@@ -1,19 +1,41 @@
 import { useEffect, useMemo, useState } from "react"
 import { useStore } from "../context"
 import fetch from "isomorphic-unfetch"
+import ContentEditable from "react-contenteditable"
+import { BiSkipNext as NextIcon } from "react-icons/bi"
+import { BiSkipPrevious as PrevIcon } from "react-icons/bi"
 
-export const Word: React.FC<{ word: string }> = ({ word }) => {
+export const Word: React.FC<{ word: string, index: number }> = ({ word, index }) => {
 
-    const { isPause, isOriginal } = useStore()
-    const [synonyms, setSynonyms] = useState([word])
+    if (word === " ") return null
+
+    const { isPause, isOriginal, setTranslate } = useStore()
+    const [synonyms, setSynonyms] = useState(()=>{
+        const isPunc = !word.match("^[a-zA-Z0-9]+$")
+        return [isPunc ? word.slice(0, -1) : word]
+    })
     const [current, setCurrent] = useState(0)
     const [pauseCount, setPause] = useState(0)
+    const [isFocus, setFocus] = useState(false)
+
+    const [punc, setPunc] = useState("")
+
+    const [localPause, setLocalPause] = useState(false)
+
+    const [isHover, setHover] = useState(false)
 
     useEffect(() => {
 
         const interval = setInterval(() => setCurrent((c) => c + 1), 5000)
 
-        fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + word)
+        const isPunc = !word.match("^[a-zA-Z0-9]+$")
+        const send = isPunc ? word.slice(0, -1) : word
+
+        if (isPunc){
+            setPunc(word.slice(-1))
+        }
+
+        fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + send)
             .then(r => r.json())
             .then(data => {
                 data.length > 0 && data.map((d) =>
@@ -25,34 +47,72 @@ export const Word: React.FC<{ word: string }> = ({ word }) => {
             })
 
         return () => clearInterval(interval)
-    }, [])
+    }, [word])
+
+    console.log({punc})
 
 
     const triggerPause = () => setPause(current)
 
     useEffect(() => {
-        if (isPause) {
-            triggerPause()
-        }
+        setLocalPause(isPause)
     }, [isPause])
 
-    const idxCount = synonyms.length > 1 ? current > synonyms.length - 1 ? 0 : current : 0
-    const idx = !idxCount ? 0 : isPause ? pauseCount : current
+    useEffect(() => {
+        if (localPause) {
+            triggerPause()
+        }
+    }, [localPause])
+
+    useEffect(() => {
+        if (current > synonyms.length - 1) setCurrent(0)
+    }, [synonyms, current])
+
+    useEffect(() => {
+        setLocalPause(isHover)
+    }, [isHover])
+
+    const idxCount = current
+    const idx = !idxCount ? 0 : localPause ? pauseCount : current
 
     const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
 
     const syn = synonyms[idx]
+    console.log({ syn })
     const first = isLower ? syn[0] : syn[0].toUpperCase()
     const end = syn.slice(1)
 
     const print = isOriginal ? word : `${first}${end}`
 
+    useEffect(() => {
+        setTranslate(print, index)
+    }, [print])
 
     return (
-        <div
-            style={{ display: "inline-block" }}
+        <div className="wordWrap"
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
         >
-            {print}
+            {
+                isHover &&
+                <div className="icon">
+                    <PrevIcon />
+                </div>
+            }
+            <ContentEditable
+                html={`<span>${print}${punc}</span>`}
+                disabled={false}
+                onChange={() => console.log("changed")}
+                onFocus={() => setFocus(true)}
+                onBlur={() => setFocus(false)}
+                className={`editable ${isHover ? "active" : ""}`}
+            />
+            {
+                isHover &&
+                <div className="icon">
+                    <NextIcon />
+                </div>
+            }
         </div>
     )
 

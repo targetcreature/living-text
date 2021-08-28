@@ -1,17 +1,13 @@
 import { useEffect, useMemo, useState } from "react"
 import { useStore } from "../context"
 import fetch from "isomorphic-unfetch"
-import ContentEditable from "react-contenteditable"
 
-export const Word: React.FC<{ word: string, index: number }> = ({ word, index }) => {
+export const Word: React.FC<{ word: string }> = ({ word }) => {
 
-    if(word === " ") return null 
-
-    const { isPause, isOriginal, setTranslate } = useStore()
+    const { isPause, isOriginal } = useStore()
     const [synonyms, setSynonyms] = useState([word])
     const [current, setCurrent] = useState(0)
     const [pauseCount, setPause] = useState(0)
-    const [isFocus, setFocus] = useState(false)
 
     useEffect(() => {
 
@@ -51,28 +47,13 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
 
     const print = isOriginal ? word : `${first}${end}`
 
-    useEffect(() => {
-        setTranslate(print, index)
-    }, [print])
-
 
     return (
-        <ContentEditable
-            html={`<span>${print}</span>`}
-            disabled={false}
-            onChange={() => console.log("changed")}
-            onFocus={() => setFocus(true)}
-            onBlur={() => setFocus(false)}
-            className={`editable ${isFocus ? "active" : ""}`}
-        />
+        <div
+            style={{ display: "inline-block" }}
+        >
+            {print}
+        </div>
     )
-
-    // return (
-    //     <div
-    //         style={{ display: "inline-block" }}
-    //     >
-    //         {print}
-    //     </div>
-    // )
 
 }
