@@ -12,7 +12,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     const { isPause, isOriginal, setTranslate } = useStore()
     const [synonyms, setSynonyms] = useState(()=>{
         const isPunc = !word.match("^[a-zA-Z0-9]+$")
-        return [isPunc ? word.slice(0, -1) : word]
+        return [isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word]
     })
     const [current, setCurrent] = useState(0)
     const [pauseCount, setPause] = useState(0)
@@ -29,10 +29,10 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
         const interval = setInterval(() => setCurrent((c) => c + 1), 5000)
 
         const isPunc = !word.match("^[a-zA-Z0-9]+$")
-        const send = isPunc ? word.slice(0, -1) : word
+        const send = isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word
 
         if (isPunc){
-            setPunc(word.slice(-1))
+            setPunc(word.slice(word.match(/[^a-zA-Z0-9]/).index))
         }
 
         fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + send)
@@ -75,10 +75,16 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     const idxCount = current
     const idx = !idxCount ? 0 : localPause ? pauseCount : current
 
-    const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
+    const source = synonyms[0]
 
-    const syn = synonyms[idx]
-    console.log({ syn })
+    
+    // const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
+    const isLower = source[0] == source[0].toLowerCase() && source[0] != source[0].toUpperCase()
+    
+    const syn = synonyms[idx] || synonyms[0]
+
+    console.log({source, syn, idx})
+
     const first = isLower ? syn[0] : syn[0].toUpperCase()
     const end = syn.slice(1)
 
