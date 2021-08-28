@@ -47,11 +47,15 @@ export const useStore = (): UProps => {
 
     const [state, setState] = useContext(Context)
 
-    const pushWord = (word: string) => setState((s) => {
-        const { source } = s
-        source.push(word)
-        return ({ ...s, source })
-    })
+    const pushWord = (word: string) => {
+        if (!word) return null
+        setState((s) => {
+            const { source } = s
+            source.push(word)
+            return ({ ...s, source })
+        }
+        )
+    }
 
     const setTranslate = (word: string, index: number) => setState((s) => {
         const { translation } = s
@@ -64,7 +68,7 @@ export const useStore = (): UProps => {
         ...state,
         setStore: setState,
         pushWord: (word) => pushWord(word),
-        setTranslate: (w,i) => setTranslate(w,i)
+        setTranslate: (w, i) => setTranslate(w, i)
     }
 
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useStore } from "../context"
 import { Word } from "./Word2"
 
-export const Form: React.FC = () => {
+export const TextArea: React.FC = () => {
 
     const { words, setStore, source, pushWord, translation } = useStore()
 

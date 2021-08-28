@@ -35,6 +35,15 @@ input{
     right: 3vh;
 }
 
+.editable{
+    display: inline-block;
+    
+    &.new{
+        border: 1px solid lightgray;
+        min-width: 10rem;
+    }
+}
+
 
 @import "./mobile.scss";
 
