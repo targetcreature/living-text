@@ -88,7 +88,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     const first = isLower ? syn[0] : syn[0].toUpperCase()
     const end = syn.slice(1)
 
-    const print = isOriginal ? word : `${first}${end}`
+    const print = isOriginal ? source : `${first}${end}`
 
     useEffect(() => {
         setTranslate(print, index)
