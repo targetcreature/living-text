@@ -8,10 +8,14 @@ export type State = {
     }[]
     isPause: boolean
     isOriginal: boolean
+    source: string[]
+    translation: string[]
 }
 
-const init = { 
+const init = {
     words: [],
+    source: [],
+    translation: [],
     isPause: false,
     isOriginal: false,
     isLine: false
@@ -34,6 +38,8 @@ export const Provider: React.FC<{}> = ({ children }) => {
 interface UProps extends State {
 
     setStore: React.Dispatch<React.SetStateAction<State>>
+    pushWord: (string) => void
+    setTranslate: (word: string, index: number) => void
 
 }
 
@@ -41,9 +47,24 @@ export const useStore = (): UProps => {
 
     const [state, setState] = useContext(Context)
 
+    const pushWord = (word: string) => setState((s) => {
+        const { source } = s
+        source.push(word)
+        return ({ ...s, source })
+    })
+
+    const setTranslate = (word: string, index: number) => setState((s) => {
+        const { translation } = s
+        translation[index] = word
+        return ({ ...s, translation })
+    })
+
+
     return {
         ...state,
-        setStore: setState
+        setStore: setState,
+        pushWord: (word) => pushWord(word),
+        setTranslate: (w,i) => setTranslate(w,i)
     }
 
 }
