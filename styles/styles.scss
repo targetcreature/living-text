@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-size: 36px;
-    *{
+    * {
         box-sizing: border-box;
     }
 }
@@ -42,7 +42,7 @@ input {
     display: inline-block;
     background: white;
     padding: 0 0.5rem;
-    &.pinned{
+    &.pinned {
         color: gray;
     }
     // &:not(.new){
@@ -51,7 +51,7 @@ input {
 }
 
 .newContainer,
-.wordWrap{
+.wordWrap {
     display: inline-block;
     padding: 30px 0.5rem 30px;
     border-radius: 10px;
@@ -66,7 +66,7 @@ input {
 .wordWrap {
     position: relative;
     text-align: center;
-    &:hover{
+    &:hover {
         border: 1px solid lightgray;
     }
     .icons {
@@ -76,24 +76,25 @@ input {
         position: absolute;
         height: 30px;
         top: 0px;
-        right:0;
+        right: 0;
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        .center{
+        .center {
             font-size: 0.5em;
         }
         &.hidden {
             display: none;
         }
-        .active{
+        .active {
             color: white;
         }
     }
 }
 
-.speech{
+.speech {
+    cursor: pointer;
     background: lightgray;
     position: absolute;
     // border-bottom-right-radius: 10px;
@@ -107,12 +108,12 @@ input {
     display: grid;
     grid-auto-flow: column;
     // justify-content: space-around;
-    span{
-        &.active{
+    span {
+        &.active {
             background: darkgray;
         }
 
-        span{
+        span {
             width: 100%;
             height: 100%;
             display: flex;

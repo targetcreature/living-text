@@ -108,6 +108,12 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
         return prev.concat(syns[val])
     }, [source])
 
+    const hasSyns = Object.values(allSynonyms).reduce((prev, val) =>
+        prev + val.length
+        , 0) > 1
+
+    const showUI = isHover && hasSyns
+
     const print = getPrint(source, pool[idx], punc)
 
     useEffect(() => {
@@ -130,7 +136,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
             }}
         >
             {
-                isHover &&
+                showUI &&
                 <>
                     <div className="icons">
                         <PrevIcon
@@ -170,10 +176,10 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                         return { ...state, isPause: false }
                     })
                 }}
-                className={`editable ${isHover ? "active" : ""} ${isPinned ? "pinned" : ""}`}
+                className={`editable ${showUI ? "active" : ""} ${isPinned ? "pinned" : ""}`}
             />
             {
-                isHover &&
+                showUI &&
                 <div className="speech">
                     {
                         Object.keys(allSynonyms).map((k, i) => {
@@ -182,8 +188,8 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                                     key={i}
                                     className={pos.includes(i) ? "active" : ""}
                                     onClick={() => {
+                                        setPinned(true)
                                         if (pos.includes(i)) {
-                                            console.log("true")
                                             const idx = pos.indexOf(i)
                                             setPos((p) => {
                                                 return removeIndex(p, idx)
