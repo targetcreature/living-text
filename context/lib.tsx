@@ -35,11 +35,11 @@ export const getPrint = (source: string, word: string, punc: string) => {
 
 export const getPos = (p: string) => {
     const dic = {
-        adjective: "Adj",
-        adverb: "Adv",
-        suffix: "Sx"
+        adjective: "adj",
+        adverb: "adv",
+        suffix: "sx"
     }
-    return dic[p] || p[0].toUpperCase()
+    return dic[p] || p[0]
 }
 
 export const removeIndex = (arr, i) => {

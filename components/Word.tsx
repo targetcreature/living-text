@@ -16,7 +16,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     const ref = useRef<HTMLInputElement>()
     const [width, setWidth] = useState(0)
 
-    const [allSynonyms, setAllSynonyms] = useState({})
+    const [allSynonyms, setAllSynonyms] = useState<{ [key: string]: string[] }>({})
     // const [allSynonyms, setAllSynonyms] = useState({ all: [] })
 
     const [synonyms, setSynonyms] = useState(() => {
@@ -103,10 +103,10 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     const idxCount = current
     const idx = paused ? pauseCount : !idxCount ? 0 : current
 
-    const pool = pos.reduce((prev, val)=>{
+    const pool = pos.reduce((prev, val) => {
         const syns = Object.values(allSynonyms)
         return prev.concat(syns[val])
-    },[source])
+    }, [source])
 
     const print = getPrint(source, pool[idx], punc)
 
@@ -114,7 +114,6 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
         setTranslate(print, index)
     }, [print])
 
-    console.log(pool)
 
     return (
         <div className={`wordWrap`}
@@ -194,7 +193,11 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                                             setPos((p) => [...p, i])
                                         }
                                     }}
-                                >{getPos(k)}</span>
+                                >
+                                    <span>
+                                        {getPos(k)}
+                                    </span>
+                                </span>
                             )
                         })
                     }
