@@ -84,7 +84,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     }, [print])
 
     return (
-        <div className="wordWrap"
+        <div className={`wordWrap`}
             ref={ref}
             onMouseEnter={(e) => {
                 setHover(true)
@@ -99,24 +99,28 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
         >
             {
                 isHover &&
-                <div className="icons">
-                    <PrevIcon
-                        className="left"
-                        onClick={() => {
-                            setPause((p) => p > 0 ? p - 1 : synonyms.length)
-                        }} />
-                    <PauseIcon
-                        className="center"
-                        onClick={() => setPinned((p) => !p)}
-                        color={isPinned ? "pink" : "black"}
-                    />
-                    <NextIcon
-                        className="right"
-                        onClick={() => {
-                            setWidth(ref && ref.current ? ref.current.offsetWidth - 22 : 0)
-                            setPause((p) => p > synonyms.length ? 0 : p + 1)
-                        }} />
-                </div>
+                <>
+                    <div className="icons">
+                        <PrevIcon
+                            className="left"
+                            onClick={() => {
+                                setPinned(true)
+                                setPause((p) => p > 0 ? p - 1 : synonyms.length)
+                            }} />
+                        <PauseIcon
+                            className={`center ${isPinned ? "active" : ""}`}
+                            onClick={() => setPinned((p) => !p)}
+                        // color={isPinned ? "white" : "black"}
+                        />
+                        <NextIcon
+                            className="right"
+                            onClick={() => {
+                                setPinned(true)
+                                setWidth(ref && ref.current ? ref.current.offsetWidth : 0)
+                                setPause((p) => p > synonyms.length ? 0 : p + 1)
+                            }} />
+                    </div>
+                </>
             }
             <ContentEditable
                 html={`<span>${print}${punc}</span>`}
@@ -124,7 +128,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                 onChange={() => console.log("changed")}
                 onFocus={() => setFocus(true)}
                 onBlur={() => setFocus(false)}
-                className={`editable ${isHover ? "active" : ""}`}
+                className={`editable ${isHover ? "active" : ""} ${isPinned ? "pinned" : ""}`}
             />
         </div >
     )

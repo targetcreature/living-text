@@ -33,12 +33,14 @@ export const Editable: React.FC = () => {
                     </Fragment>
                 )
             }
-            <ContentEditable
-                html={state} // innerHTML of the editable div
-                disabled={false}       // use true to disable editing
-                onChange={({ target }) => handleChange(target.value)} // handle innerHTML change
-                className="editable new"
-            />
+            <div className="newContainer">
+                <ContentEditable
+                    html={state} // innerHTML of the editable div
+                    disabled={false}       // use true to disable editing
+                    onChange={({ target }) => handleChange(target.value)} // handle innerHTML change
+                    className="editable new"
+                />
+            </div>
         </div>
     )
 
