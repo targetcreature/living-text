@@ -1,26 +1,30 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useStore } from "../context"
 import fetch from "isomorphic-unfetch"
 import ContentEditable from "react-contenteditable"
 import { BiSkipNext as NextIcon } from "react-icons/bi"
 import { BiSkipPrevious as PrevIcon } from "react-icons/bi"
+import { IoMdPause as PauseIcon } from "react-icons/io"
 
 export const Word: React.FC<{ word: string, index: number }> = ({ word, index }) => {
 
     if (word === " ") return null
 
+    const ref = useRef()
+
+    const [width, setWidth] = useState(0)
+
     const { isPause, isOriginal, setTranslate } = useStore()
-    const [synonyms, setSynonyms] = useState(()=>{
+    const [synonyms, setSynonyms] = useState(() => {
         const isPunc = !word.match("^[a-zA-Z0-9]+$")
         return [isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word]
     })
     const [current, setCurrent] = useState(0)
     const [pauseCount, setPause] = useState(0)
     const [isFocus, setFocus] = useState(false)
+    const [isPinned, setPinned] = useState(false)
 
     const [punc, setPunc] = useState("")
-
-    const [localPause, setLocalPause] = useState(false)
 
     const [isHover, setHover] = useState(false)
 
@@ -31,7 +35,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
         const isPunc = !word.match("^[a-zA-Z0-9]+$")
         const send = isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word
 
-        if (isPunc){
+        if (isPunc) {
             setPunc(word.slice(word.match(/[^a-zA-Z0-9]/).index))
         }
 
@@ -49,41 +53,26 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
         return () => clearInterval(interval)
     }, [word])
 
-    console.log({punc})
-
-
     const triggerPause = () => setPause(current)
-
-    useEffect(() => {
-        setLocalPause(isPause)
-    }, [isPause])
-
-    useEffect(() => {
-        if (localPause) {
-            triggerPause()
-        }
-    }, [localPause])
 
     useEffect(() => {
         if (current > synonyms.length - 1) setCurrent(0)
     }, [synonyms, current])
 
+    const paused = isPause || isHover || isFocus || isPinned
+
     useEffect(() => {
-        setLocalPause(isHover)
-    }, [isHover])
+        if (paused) triggerPause()
+    }, [paused])
 
     const idxCount = current
-    const idx = !idxCount ? 0 : localPause ? pauseCount : current
+    const idx = !idxCount ? 0 : paused ? pauseCount : current
 
     const source = synonyms[0]
 
-    
-    // const isLower = word[0] == word[0].toLowerCase() && word[0] != word[0].toUpperCase()
     const isLower = source[0] == source[0].toLowerCase() && source[0] != source[0].toUpperCase()
-    
-    const syn = synonyms[idx] || synonyms[0]
 
-    console.log({source, syn, idx})
+    const syn = synonyms[idx] || synonyms[0]
 
     const first = isLower ? syn[0] : syn[0].toUpperCase()
     const end = syn.slice(1)
@@ -96,13 +85,37 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
 
     return (
         <div className="wordWrap"
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
+            ref={ref}
+            onMouseEnter={(e) => {
+                setHover(true)
+            }}
+            onMouseLeave={() => {
+                setHover(false)
+                setWidth(0)
+            }}
+            style={{
+                minWidth: width
+            }}
         >
             {
                 isHover &&
-                <div className="icon">
-                    <PrevIcon />
+                <div className="icons">
+                    <PrevIcon
+                        className="left"
+                        onClick={() => {
+                            setPause((p) => p > 0 ? p - 1 : synonyms.length)
+                        }} />
+                    <PauseIcon
+                        className="center"
+                        onClick={() => setPinned((p) => !p)}
+                        color={isPinned ? "pink" : "black"}
+                    />
+                    <NextIcon
+                        className="right"
+                        onClick={() => {
+                            setWidth(ref && ref.current ? ref.current.offsetWidth - 22 : 0)
+                            setPause((p) => p > synonyms.length ? 0 : p + 1)
+                        }} />
                 </div>
             }
             <ContentEditable
@@ -113,13 +126,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                 onBlur={() => setFocus(false)}
                 className={`editable ${isHover ? "active" : ""}`}
             />
-            {
-                isHover &&
-                <div className="icon">
-                    <NextIcon />
-                </div>
-            }
-        </div>
+        </div >
     )
 
 }

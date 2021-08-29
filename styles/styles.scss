@@ -35,13 +35,16 @@ input {
     right: 3vh;
 }
 
-.editable{
+.editable {
     display: inline-block;
+    // &:not(.new){
+    // outline-color: lightblue;
+    // }
 }
 
-.wordWrap{
+.wordWrap {
     display: inline-block;
-    padding: 20px 5px;
+    padding: 20px 10px;
 }
 .new {
     border: 1px solid lightgray;
@@ -49,19 +52,27 @@ input {
 }
 
 .wordWrap {
+    position: relative;
+    text-align: center;
     &:hover {
         border: 1px solid pink;
     }
-    .icon {
-        height: 100%;
-        display: inline-flex;
+    .icons {
+        position: absolute;
+        top: -10px;
+        right:0;
+        width: 100%;
+        display: flex;
         align-items: center;
-        // border: 1px solid green;
-        &.hidden{
+        justify-content: space-between;
+        border: 1px solid green;
+        .center{
+            font-size: 0.5em;
+        }
+        &.hidden {
             display: none;
         }
     }
 }
-
 
 @import "./mobile.scss";
