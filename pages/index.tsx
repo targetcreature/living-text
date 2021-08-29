@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { Provider, useStore } from "../context"
-import { Form } from "../components/Form"
 import { IoMdPause as PauseIcon } from "react-icons/io"
 import { IoMdPlay as PlayIcon } from "react-icons/io"
 import { VscEye as EyeIcon } from "react-icons/vsc"
+import { Editable } from "../components/Editable"
 
 const App: React.FC = () => {
 
@@ -22,21 +22,20 @@ const App: React.FC = () => {
             >
 
                 <div id="container">
-                    <Form />
-                    <div
-                        id="buttons"
-                    // style={{
-                    //     position: "absolute",
-                    //     top: "5vh",
-                    //     right: "5vh",
-                    // }}
-                    >
-                        <Pause />
-                        <Original />
-                    </div>
+                    <Editable />
+                    <UI />
                 </div>
             </div>
         </Provider>
+    )
+}
+
+const UI: React.FC = () => {
+    return (
+        <div id="buttons">
+            <Pause />
+            <Original />
+        </div>
     )
 }
 
@@ -72,7 +71,7 @@ const Original: React.FC = () => {
         <EyeIcon
             onMouseEnter={() => setStore((s) => ({ ...s, isOriginal: true }))}
             onMouseLeave={() => setStore((s) => ({ ...s, isOriginal: false }))}
-            onClick={()=> setStore((s)=>({...s, isOriginal: !s.isOriginal}))}
+            onClick={() => setStore((s) => ({ ...s, isOriginal: !s.isOriginal }))}
             color={isOriginal ? "black" : "lightgray"}
         />
     )

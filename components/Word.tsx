@@ -1,56 +1,91 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useStore } from "../context"
-import fetch from "isomorphic-unfetch"
 import ContentEditable from "react-contenteditable"
 import { BiSkipNext as NextIcon } from "react-icons/bi"
 import { BiSkipPrevious as PrevIcon } from "react-icons/bi"
 import { IoMdPause as PauseIcon } from "react-icons/io"
+import { fetchData, getPos, getPrint, stripPunc, removeIndex } from "../context/lib"
+import { Data } from "../context/_types"
 
 export const Word: React.FC<{ word: string, index: number }> = ({ word, index }) => {
 
     if (word === " ") return null
 
-    const ref = useRef()
-
-
     const { isPause, isOriginal, setTranslate, setStore } = useStore()
+
+    const ref = useRef<HTMLInputElement>()
+    const [width, setWidth] = useState(0)
+
+    const [allSynonyms, setAllSynonyms] = useState({})
+    // const [allSynonyms, setAllSynonyms] = useState({ all: [] })
+
     const [synonyms, setSynonyms] = useState(() => {
-        const isPunc = !word.match("^[a-zA-Z0-9]+$")
-        return [isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word]
+        const [w] = stripPunc(word)
+        return [w]
+    })
+
+    const [punc, setPunc] = useState("")
+
+    const [source, setSource] = useState(() => {
+        const [w] = stripPunc(word)
+        return w
     })
     const [current, setCurrent] = useState(0)
     const [pauseCount, setPause] = useState(0)
+
+    const [pos, setPos] = useState([0])
+
+    const [isHover, setHover] = useState(false)
     const [isFocus, setFocus] = useState(false)
     const [isPinned, setPinned] = useState(false)
 
-    const [width, setWidth] = useState(0)
-    const [punc, setPunc] = useState("")
+    useEffect(() => {
 
-    const [isHover, setHover] = useState(false)
+        setPos(() => {
+            return Object.keys(allSynonyms).map((_, i) => i)
+        })
+
+    }, [allSynonyms])
 
     useEffect(() => {
 
         const interval = setInterval(() => setCurrent((c) => c + 1), 5000)
 
-        const isPunc = !word.match("^[a-zA-Z0-9]+$")
-        const send = isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word
+        const [send, punc] = stripPunc(word)
 
-        if (isPunc) {
-            setPunc(word.slice(word.match(/[^a-zA-Z0-9]/).index))
-        }
+        setPunc(punc)
+        setSource(send)
 
-        fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + send)
-            .then(r => r.json())
-            .then(data => {
-                data.length > 0 && data.map((d) =>
-                    d.meanings.map((m) =>
-                        m.definitions.map((def) =>
-                            setSynonyms((s) => {
-                                return [...s, ...def.synonyms]
-                            }))))
-            })
+        fetchData(send, (data) => {
+            data.map((d) =>
+                d.meanings.map((m) =>
+                    m.definitions.map((def) =>
+                        setAllSynonyms((s) => {
+                            const speech = m.partOfSpeech
+                            const arr = s[speech] || []
+                            const newArray = [...arr, ...def.synonyms]
+                            // const newAll = [...s.all, ...def.synonyms]
+                            if (def.synonyms.length) {
+                                return {
+                                    ...s,
+                                    // all: newAll,
+                                    [speech]: newArray
+                                }
+                            }
+                            return s
+                        }
+                        ))))
+
+            data.map((d) =>
+                d.meanings.map((m) =>
+                    m.definitions.map((def) =>
+                        setSynonyms((s) => {
+                            return [...s, ...def.synonyms]
+                        }))))
+        })
 
         return () => clearInterval(interval)
+
     }, [word])
 
     const triggerPause = () => setPause(current)
@@ -66,22 +101,20 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     }, [paused])
 
     const idxCount = current
-    const idx = !idxCount ? 0 : paused ? pauseCount : current
+    const idx = paused ? pauseCount : !idxCount ? 0 : current
 
-    const source = synonyms[0]
+    const pool = pos.reduce((prev, val)=>{
+        const syns = Object.values(allSynonyms)
+        return prev.concat(syns[val])
+    },[source])
 
-    const isLower = source[0] == source[0].toLowerCase() && source[0] != source[0].toUpperCase()
-
-    const syn = synonyms[idx] || synonyms[0]
-
-    const first = isLower ? syn[0] : syn[0].toUpperCase()
-    const end = syn.slice(1)
-
-    const print = isOriginal ? source : `${first}${end}`
+    const print = getPrint(source, pool[idx], punc)
 
     useEffect(() => {
         setTranslate(print, index)
     }, [print])
+
+    console.log(pool)
 
     return (
         <div className={`wordWrap`}
@@ -105,19 +138,18 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                             className="left"
                             onClick={() => {
                                 setPinned(true)
-                                setPause((p) => p > 0 ? p - 1 : synonyms.length)
+                                setPause((p) => p > 0 ? p - 1 : pool.length)
                             }} />
                         <PauseIcon
                             className={`center ${isPinned ? "active" : ""}`}
                             onClick={() => setPinned((p) => !p)}
-                        // color={isPinned ? "white" : "black"}
                         />
                         <NextIcon
                             className="right"
                             onClick={() => {
                                 setPinned(true)
                                 setWidth(ref && ref.current ? ref.current.offsetWidth : 0)
-                                setPause((p) => p > synonyms.length ? 0 : p + 1)
+                                setPause((p) => p > pool.length ? 0 : p + 1)
                             }} />
                     </div>
                 </>
@@ -141,6 +173,33 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                 }}
                 className={`editable ${isHover ? "active" : ""} ${isPinned ? "pinned" : ""}`}
             />
+            {
+                isHover &&
+                <div className="speech">
+                    {
+                        Object.keys(allSynonyms).map((k, i) => {
+                            return (
+                                <span
+                                    key={i}
+                                    className={pos.includes(i) ? "active" : ""}
+                                    onClick={() => {
+                                        if (pos.includes(i)) {
+                                            console.log("true")
+                                            const idx = pos.indexOf(i)
+                                            setPos((p) => {
+                                                return removeIndex(p, idx)
+                                            })
+                                        }
+                                        else {
+                                            setPos((p) => [...p, i])
+                                        }
+                                    }}
+                                >{getPos(k)}</span>
+                            )
+                        })
+                    }
+                </div>
+            }
         </div >
     )
 

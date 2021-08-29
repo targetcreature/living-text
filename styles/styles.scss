@@ -91,4 +91,10 @@ input {
     }
 }
 
+.speech{
+    span.active{
+        background: lightgray;
+    }
+}
+
 @import "./mobile.scss";

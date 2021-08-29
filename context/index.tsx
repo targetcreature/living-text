@@ -10,12 +10,14 @@ export type State = {
     isOriginal: boolean
     source: string[]
     translation: string[]
+    details: any[]
 }
 
 const init = {
     words: [],
     source: [],
     translation: [],
+    details: [],
     isPause: false,
     isOriginal: false,
     isLine: false
@@ -40,6 +42,7 @@ interface UProps extends State {
     setStore: React.Dispatch<React.SetStateAction<State>>
     pushWord: (string) => void
     setTranslate: (word: string, index: number) => void
+    setDetails: (details: any, index: number) => void
 
 }
 
@@ -63,12 +66,19 @@ export const useStore = (): UProps => {
         return ({ ...s, translation })
     })
 
+    const setDetails = (d: string, index: number) => setState((s) => {
+        const { details } = s
+        details[index] = d
+        return ({ ...s, details })
+    })
+
 
     return {
         ...state,
         setStore: setState,
         pushWord: (word) => pushWord(word),
-        setTranslate: (w, i) => setTranslate(w, i)
+        setTranslate: (w, i) => setTranslate(w, i),
+        setDetails: (d, i) => setDetails(d,i)
     }
 
 }
