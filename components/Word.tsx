@@ -12,9 +12,8 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
 
     const ref = useRef()
 
-    const [width, setWidth] = useState(0)
 
-    const { isPause, isOriginal, setTranslate } = useStore()
+    const { isPause, isOriginal, setTranslate, setStore } = useStore()
     const [synonyms, setSynonyms] = useState(() => {
         const isPunc = !word.match("^[a-zA-Z0-9]+$")
         return [isPunc ? word.slice(0, word.match(/[^a-zA-Z0-9]/).index) : word]
@@ -24,6 +23,7 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
     const [isFocus, setFocus] = useState(false)
     const [isPinned, setPinned] = useState(false)
 
+    const [width, setWidth] = useState(0)
     const [punc, setPunc] = useState("")
 
     const [isHover, setHover] = useState(false)
@@ -126,8 +126,19 @@ export const Word: React.FC<{ word: string, index: number }> = ({ word, index })
                 html={`<span>${print}${punc}</span>`}
                 disabled={false}
                 onChange={() => console.log("changed")}
-                onFocus={() => setFocus(true)}
-                onBlur={() => setFocus(false)}
+                onFocus={() => {
+                    setFocus(true)
+                    setPinned(true)
+                    setStore((state) => {
+                        return { ...state, isPause: true }
+                    })
+                }}
+                onBlur={() => {
+                    setFocus(false)
+                    setStore((state) => {
+                        return { ...state, isPause: false }
+                    })
+                }}
                 className={`editable ${isHover ? "active" : ""} ${isPinned ? "pinned" : ""}`}
             />
         </div >

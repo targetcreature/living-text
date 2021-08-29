@@ -29,7 +29,6 @@ export const Editable: React.FC = () => {
                 source.map((w, i) =>
                     <Fragment key={i}>
                         <Word word={w} index={i} />
-                        <span>&nbsp;</span>
                     </Fragment>
                 )
             }
